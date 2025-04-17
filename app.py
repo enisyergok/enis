@@ -519,3 +519,22 @@ def ask_deepseek():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)), debug=False)
+@app.route("/add_process", methods=["GET", "POST"])
+def add_process():
+    with open("data/products_data.json", "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if request.method == "POST":
+        process_name = request.form["process_name"].strip()
+        personnel_count = int(request.form["personnel_count"])
+
+        if process_name not in data["processes"]:
+            data["processes"].append(process_name)
+            data["process_personnel"][process_name] = personnel_count
+
+            with open("data/products_data.json", "w", encoding="utf-8") as f:
+                json.dump(data, f, indent=4, ensure_ascii=False)
+
+        return redirect(url_for("index"))
+
+    return render_template("add_process.html")
